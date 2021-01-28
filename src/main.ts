@@ -8,11 +8,10 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('todo api')
     .setVersion('1.0')
-    .addTag('api')
     .build();
 
   const documents = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, documents);
+  SwaggerModule.setup('', app, documents);
   await app.listen(port);
 }
 bootstrap();
