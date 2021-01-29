@@ -11,6 +11,12 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('todo api')
     .setVersion('1.0')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      description: 'Enter input bellow : Bearer {token}',
+    })
     .build();
 
   const documents = SwaggerModule.createDocument(app, swaggerConfig);
