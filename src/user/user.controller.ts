@@ -1,3 +1,4 @@
+import { Todo } from './dto/todo.dto';
 import {
   Body,
   Controller,
@@ -51,7 +52,7 @@ export class UserController {
   @UseGuards(JwtAthGuard)
   @ApiBearerAuth()
   async AddTodo(
-    @Body() Body: { content: string },
+    @Body() Body: Todo,
     @Request() req,
   ): Promise<{ message: string }> {
     try {
