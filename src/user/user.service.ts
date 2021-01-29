@@ -5,14 +5,15 @@ import { Model } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { AddTodoDto } from './dto/add-todo.dto'
 import { LoginResult } from './interface/login-result.interface';
+import { Todo, TodoDocument } from './schema/todo.schema';
 import { User, UserDocument } from './schema/user.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Todo.name) private todoModel: Model<TodoDocument>,
     private readonly authService: AuthService,
   ) {}
 
@@ -48,15 +49,22 @@ export class UserService {
     return { message: 'username or password incorrect !', token: '' };
   }
 
-  async AddTodo(AddTodo: AddTodoDto): Promise<{message: string}> {
+  async AddTodo(content: string, userId: string): Promise<{ message: string }> {
     try {
-      var user = await this.userModel.findById(AddTodo.userid);
-      user.todolist.push(AddTodo.todo);
-      user.save();
-      console.log(user);
-      return {message: 'ok'};
+      const todoItem: Todo = {
+        userId: userId,
+        content: content,
+        isComplete: false,
+      };
+      await new this.todoModel(todoItem).save();
+
+      return { message: 'ok' };
     } catch {
-      return {message: 'failed'};
+      return { message: 'failed' };
     }
+  }
+
+  async GetTodoList(userId: string): Promise<TodoDocument[]> {
+    return this.todoModel['findByUserID'](userId);
   }
 }
