@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { LoginResult } from './interface/login-result.interface';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -20,9 +21,7 @@ export class UserController {
   }
 
   @Post('login')
-  async Login(
-    @Body() login: LoginDto,
-  ): Promise<{ message: string; token: string }> {
+  async Login(@Body() login: LoginDto): Promise<LoginResult> {
     return { message: 'login', token: 'asd' };
   }
 }
