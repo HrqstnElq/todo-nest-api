@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { AddTodoDto } from './dto/add-todo.dto'
 import { LoginResult } from './interface/login-result.interface';
 import { User, UserDocument } from './schema/user.schema';
 
@@ -45,5 +46,17 @@ export class UserService {
     }
 
     return { message: 'username or password incorrect !', token: '' };
+  }
+
+  async AddTodo(AddTodo: AddTodoDto): Promise<{message: string}> {
+    try {
+      var user = await this.userModel.findById(AddTodo.userid);
+      user.todolist.push(AddTodo.todo);
+      user.save();
+      console.log(user);
+      return {message: 'ok'};
+    } catch {
+      return {message: 'failed'};
+    }
   }
 }

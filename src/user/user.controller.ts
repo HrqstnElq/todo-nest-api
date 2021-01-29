@@ -10,6 +10,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAthGuard } from 'src/auth/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { AddTodoDto } from './dto/add-todo.dto'
 import { LoginResult } from './interface/login-result.interface';
 import { UserService } from './user.service';
 
@@ -45,5 +46,16 @@ export class UserController {
   @ApiBearerAuth()
   GetSecret(@Request() req): any {
     return req.user;
+  }
+
+  @Post('todo')
+  @UseGuards(JwtAthGuard)
+  @ApiBearerAuth()
+  async AddTodo(@Body() Body: AddTodoDto): Promise<{message: string}> {
+    try {
+      return this.userService.AddTodo(Body);
+    } catch (error) {
+      return { message: 'Add todo failed !'};
+    }
   }
 }
