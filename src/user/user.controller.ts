@@ -6,13 +6,14 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAthGuard } from 'src/auth/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResult } from './interface/login-result.interface';
 import { UserService } from './user.service';
 
+@ApiTags('/user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
