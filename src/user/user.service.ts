@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResult } from './interface/login-result.interface';
@@ -9,7 +10,10 @@ import { User, UserDocument } from './schema/user.schema';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly authService: AuthService,
+  ) {}
 
   async Register(register: RegisterDto): Promise<boolean> {
     const user = await this.userModel.findOne({ username: register.username });
@@ -26,18 +30,20 @@ export class UserService {
 
   async Login(login: LoginDto): Promise<LoginResult> {
     const user = await this.userModel.findOne({ username: login.username });
+    if (user) {
+      //define in user/scheme/user.scheme.ts
+      const result = await this.userModel['ComparePassword'](
+        user,
+        login.password,
+      );
 
-    //define in user/scheme/user.scheme.ts
-    const result = await this.userModel['ComparePassword'](
-      user,
-      login.password,
-    );
-
-    //return true
-    if (result) {
-      return { message: 'login successfully !', token: '' };
+      //return true
+      if (result) {
+        const token = await this.authService.GenerateToken(user);
+        return { message: 'login successfully !', token: token };
+      }
     }
 
-    return { message: 'login failed !', token: '' };
+    return { message: 'username or password incorrect !', token: '' };
   }
 }

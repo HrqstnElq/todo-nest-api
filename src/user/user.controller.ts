@@ -1,4 +1,13 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAthGuard } from 'src/auth/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResult } from './interface/login-result.interface';
@@ -23,7 +32,17 @@ export class UserController {
 
   @Post('login')
   async Login(@Body() login: LoginDto): Promise<LoginResult> {
-    await this.userService.Login(login);
-    return { message: 'login', token: 'asd' };
+    try {
+      return this.userService.Login(login);
+    } catch (error) {
+      return { message: 'Bad request', token: '' };
+    }
+  }
+
+  @Get('secret')
+  @UseGuards(JwtAthGuard)
+  @ApiBearerAuth()
+  GetSecret(@Request() req): any {
+    return req.user;
   }
 }
