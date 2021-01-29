@@ -16,12 +16,14 @@ export class UserController {
       };
 
     const result = await this.userService.Register(register);
+
     if (result) return { message: 'register successfully !' };
     else return { message: 'register failed !' };
   }
 
   @Post('login')
   async Login(@Body() login: LoginDto): Promise<LoginResult> {
+    await this.userService.Login(login);
     return { message: 'login', token: 'asd' };
   }
 }
