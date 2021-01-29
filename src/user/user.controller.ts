@@ -1,4 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UserService } from './user.service';
 
@@ -16,5 +17,12 @@ export class UserController {
     const result = await this.userService.Register(register);
     if (result) return { message: 'register successfully !' };
     else return { message: 'register failed !' };
+  }
+
+  @Post('login')
+  async Login(
+    @Body() login: LoginDto,
+  ): Promise<{ message: string; token: string }> {
+    return { message: 'login', token: 'asd' };
   }
 }
