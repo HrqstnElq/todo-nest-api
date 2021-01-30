@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { error } from 'console';
 import { JwtAthGuard } from 'src/auth/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -28,14 +29,17 @@ export class UserController {
   @Post('register')
   async Register(@Body() register: RegisterDto): Promise<{ message: string }> {
     if (register.password !== register.passwordConfirm)
-      return {
-        message: 'password and passwordconfirm not match',
-      };
+      throw new BadRequestException({
+        message: 'Password and confirm password not match',
+      });
 
     const result = await this.userService.Register(register);
 
     if (result) return { message: 'register successfully !' };
-    else return { message: 'register failed !' };
+    else
+      throw new BadRequestException({
+        message: 'Username already registered',
+      });
   }
 
   @Post('login')

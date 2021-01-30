@@ -3,7 +3,6 @@ import { IsString } from 'class-validator';
 
 export class TodoDto {
   @ApiProperty({ required: false })
-  @IsString()
   _id?: string;
 
   @ApiProperty({ required: false })
