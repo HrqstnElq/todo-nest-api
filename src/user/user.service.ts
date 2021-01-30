@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { TodoDto } from './dto/todo.dto';
+import { editTodoDto } from './dto/edit-todo.dto';
 import { LoginResult } from './interface/login-result.interface';
 import { Todo, TodoDocument } from './schema/todo.schema';
 import { User, UserDocument } from './schema/user.schema';
@@ -49,22 +51,34 @@ export class UserService {
     return { message: 'username or password incorrect !', token: '' };
   }
 
-  async AddTodo(content: string, userId: string): Promise<{ message: string }> {
+  async AddTodo(userId: string, Body: TodoDto): Promise<{ message: string }> {
     try {
       const todoItem: Todo = {
         userId: userId,
-        content: content,
+        content: Body.content,
         isComplete: false,
       };
       await new this.todoModel(todoItem).save();
 
       return { message: 'ok' };
-    } catch {
-      return { message: 'failed' };
+    } catch (err) {
+      return { message: err };
     }
   }
 
   async GetTodoList(userId: string): Promise<TodoDocument[]> {
     return this.todoModel['findByUserID'](userId);
+  }
+
+  async ClickTodo(todoId: string): Promise<{ message: string }> {
+    return this.todoModel['UpdateIsCompleteTodo'](todoId);
+  }
+
+  async EditTodo(Body: editTodoDto): Promise<{ message: string }> {
+    return this.todoModel['EditTodo'](Body.id, Body.content);
+  }
+
+  async DeleteTodo(todoId: string): Promise<{ message: string }> {
+    return this.todoModel['deleteByTodoID'](todoId);
   }
 }
