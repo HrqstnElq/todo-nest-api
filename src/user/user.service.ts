@@ -6,8 +6,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TodoDto } from './dto/todo.dto';
-import { editTodoDto } from './dto/edit-todo.dto';
-import { LoginResult } from './interface/login-result.interface';
+import { LoginResult } from './type/login-result.type';
 import { Todo, TodoDocument } from './schema/todo.schema';
 import { User, UserDocument } from './schema/user.schema';
 
@@ -71,14 +70,19 @@ export class UserService {
   }
 
   async ClickTodo(todoId: string): Promise<{ message: string }> {
-    return this.todoModel['UpdateIsCompleteTodo'](todoId);
+    return this.todoModel['ChangeStateTodo'](todoId);
   }
 
-  async EditTodo(Body: editTodoDto): Promise<{ message: string }> {
-    return this.todoModel['EditTodo'](Body.id, Body.content);
+  async EditTodo(Body: TodoDto): Promise<{ message: string }> {
+    return this.todoModel['EditTodo'](Body);
   }
 
   async DeleteTodo(todoId: string): Promise<{ message: string }> {
-    return this.todoModel['deleteByTodoID'](todoId);
+    try {
+      await this.todoModel.findByIdAndDelete(todoId);
+      return { message: 'Delete completed' };
+    } catch (err) {
+      return { message: err.message };
+    }
   }
 }

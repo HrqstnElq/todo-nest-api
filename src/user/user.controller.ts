@@ -1,23 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  Param,
   Post,
-  Patch,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAthGuard } from 'src/auth/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TodoDto } from './dto/todo.dto';
-import { idTodoDto } from './dto/id-todo.dto';
-import { editTodoDto } from './dto/edit-todo.dto';
-import { LoginResult } from './interface/login-result.interface';
+import { TodoDocument } from './schema/todo.schema';
+import { LoginResult } from './type/login-result.type';
 import { UserService } from './user.service';
-import { Todo, TodoDocument } from './schema/todo.schema';
 
 @ApiTags('/user')
 @Controller('user')
@@ -42,7 +43,7 @@ export class UserController {
     try {
       return this.userService.Login(login);
     } catch (error) {
-      return { message: 'Bad request', token: '' };
+      throw new BadRequestException(error);
     }
   }
 
@@ -63,49 +64,54 @@ export class UserController {
     try {
       return this.userService.AddTodo(req.user.userId, Body);
     } catch (error) {
-      return { message: 'Add todo failed !' };
+      throw new BadRequestException(error);
     }
   }
-  @Get('todo')
+  @Get('todo-list')
   @UseGuards(JwtAthGuard)
   @ApiBearerAuth()
   async GetTodoList(@Request() req): Promise<TodoDocument[]> {
     try {
       return this.userService.GetTodoList(req.user.userId);
     } catch (error) {
-      return;
+      throw new BadRequestException(error);
     }
   }
 
-  @Delete('todo')
+  @Delete('todo/:id')
   @UseGuards(JwtAthGuard)
   @ApiBearerAuth()
-  async DeleteTodo(@Body() Body: idTodoDto): Promise<{ message: string }> {
+  @ApiParam({ name: 'id', type: String })
+  async DeleteTodo(@Param() params): Promise<{ message: string }> {
     try {
-      return this.userService.DeleteTodo(Body.id);
+      return this.userService.DeleteTodo(params.id);
     } catch (error) {
-      return { message: 'delete failed !' };
+      //catch
+      throw new BadRequestException(error);
     }
   }
 
-  @Patch('click-todo')
+  //change state (isComplete todo item)
+  @Put('todo-change-state/:id')
   @UseGuards(JwtAthGuard)
   @ApiBearerAuth()
-  async ClickTodo(@Body() Body: idTodoDto): Promise<{ message: string }> {
+  @ApiParam({ name: 'id', type: String })
+  async ClickTodo(@Param() params): Promise<{ message: string }> {
     try {
-      return this.userService.ClickTodo(Body.id);
+      return this.userService.ClickTodo(params.id);
     } catch (error) {
-      return { message: 'click failed !' };
+      throw new BadRequestException(error);
     }
   }
-  @Patch('edit-todo')
+
+  @Put('todo')
   @UseGuards(JwtAthGuard)
   @ApiBearerAuth()
-  async EditTodo(@Body() Body: editTodoDto): Promise<{ message: string }> {
+  async EditTodo(@Body() Body: TodoDto): Promise<{ message: string }> {
     try {
       return this.userService.EditTodo(Body);
     } catch (error) {
-      return { message: 'edit failed !' };
+      throw new BadRequestException(error);
     }
   }
 }
