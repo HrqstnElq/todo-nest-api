@@ -5,13 +5,16 @@ import { Model } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { LoginResult } from './interface/login-result.interface';
+import { TodoDto } from './dto/todo.dto';
+import { LoginResult } from './type/login-result.type';
+import { Todo, TodoDocument } from './schema/todo.schema';
 import { User, UserDocument } from './schema/user.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Todo.name) private todoModel: Model<TodoDocument>,
     private readonly authService: AuthService,
   ) {}
 
@@ -45,5 +48,41 @@ export class UserService {
     }
 
     return { message: 'username or password incorrect !', token: '' };
+  }
+
+  async AddTodo(userId: string, Body: TodoDto): Promise<{ message: string }> {
+    try {
+      const todoItem: Todo = {
+        userId: userId,
+        content: Body.content,
+        isComplete: false,
+      };
+      await new this.todoModel(todoItem).save();
+
+      return { message: 'ok' };
+    } catch (err) {
+      return { message: err };
+    }
+  }
+
+  async GetTodoList(userId: string): Promise<TodoDocument[]> {
+    return this.todoModel['findByUserID'](userId);
+  }
+
+  async ClickTodo(todoId: string): Promise<{ message: string }> {
+    return this.todoModel['ChangeStateTodo'](todoId);
+  }
+
+  async EditTodo(Body: TodoDto): Promise<{ message: string }> {
+    return this.todoModel['EditTodo'](Body);
+  }
+
+  async DeleteTodo(todoId: string): Promise<{ message: string }> {
+    try {
+      await this.todoModel.findByIdAndDelete(todoId);
+      return { message: 'Delete completed' };
+    } catch (err) {
+      return { message: err.message };
+    }
   }
 }
