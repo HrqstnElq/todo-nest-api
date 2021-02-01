@@ -4,11 +4,6 @@ import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
-// type todoItem = {
-//   content: string;
-//   isComplete?: boolean;
-// };
-
 @Schema()
 export class User {
   @Prop({ required: true })
@@ -19,15 +14,6 @@ export class User {
 
   @Prop({ required: true })
   password: string;
-
-  // @Prop({
-  //   default: [],
-  //   type: {
-  //     content: { type: String, required: true },
-  //     isComplete: { type: String, default: false },
-  //   },
-  // })
-  // todoList: todoItem[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
