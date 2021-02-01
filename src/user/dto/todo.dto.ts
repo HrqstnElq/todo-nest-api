@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { Allow, IsString } from 'class-validator';
 
 export class TodoDto {
   @ApiProperty({ required: false })
-  _id?: string;
+  @Allow()
+  _id: any;
 
   @ApiProperty({ required: false })
   @IsString()
